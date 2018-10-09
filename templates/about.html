@@ -1,14 +1,4 @@
-<!Doctype html>
-<html>
-<head>
-	 {% if title %}
-        <title>The Home Page - {{title}}</title>
-        {% else %}
-        <title>The Home Page</title>
-        {% endif %}
-
-</head>
-<body>
+{% extends "layout.html" %}
+{% block content %}
 	<h1>About Page</h1>
-</body>
-</html>
+{% endblock content %}
