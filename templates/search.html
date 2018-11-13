@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+
+	{% for row in rows %}
+    <tr>
+        <td>{{ row.persname }}</a></td>
+    </tr>
+    {% endfor %}
+
+
+
+
+	<div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+	 <div class="sidebar-module sidebar-module-inset">
+	<h1>Search Page</h1>
+	 <form class="form-inline" method="GET" action="search">
+	   <div class="form-group">
+	    <label for="query">Name</label>
+		<input type="text" class="form-control" name="query" id="query">
+	     </div>
+		<button type="submit" class="btn btn-primary">Search</button>
+		</form>
+	     </div>
+	     </div>
+	 
+
+{% for row in rows %}
+    <tr>
+        <td>{{ row.persname }}</a></td>
+    </tr>
+    {% endfor %}	
+
+
+{% endblock content %}

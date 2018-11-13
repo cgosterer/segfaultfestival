@@ -1,6 +1,14 @@
-from flask import Flask, render_template, url_for, flash, redirect
+from flask import Flask, render_template, url_for, flash, redirect, request
 from forms import RegistrationForm, LoginForm
+from flask_sqlalchemy import SQLAlchemy
+import flask_whooshalchemy as wa
+
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:01Sda&hw@localhost/testdb'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
+app.config['WHOOSH_BASE']='whoosh'
+db = SQLAlchemy(app)
 
 
 app.config['SECRET_KEY'] = 'KJNF0128YURT08TN8G20TY0H0'
@@ -21,6 +29,14 @@ posts = [
 		'date_posted': '23 October 1992'
         }
 ]
+
+
+class testtable(db.Model):
+	__tablename__ = 'testtable'
+	__searchable__ = ['persname']				# names of columns that will be searchable
+	persname = db.Column(db.String(255), primary_key=True)
+
+wa.whoosh_index(app, testtable) 					#Post is the name of the above class
 
 
 
@@ -52,6 +68,12 @@ def login():
 		else:
 			flash('Login Unsuccessful, Check username and password', 'danger')
 	return render_template('login.html', title='Login', form=form)
+
+@app.route('/search')
+def search():
+	#rows = testtable.query.whoosh_search(request.args.get('query'))		# this may not do what you think it does
+	rows = testtable.query.all()
+	return render_template('search.html', rows = rows)
 
 if __name__ == '__main__':
 	app.run(debug=True)
