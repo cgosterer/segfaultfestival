@@ -5,7 +5,12 @@ import flask_whooshalchemy as wa
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:01Sda&hw@localhost/testdb'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:01Sda&hw@localhost/testdb'
+
+#tring to copnnect to gearhost database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://costerertestdb:Ik6N-wXcGo7_@den1.mysql6.gear.host/costerertestdb'
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 app.config['WHOOSH_BASE']='whoosh'
 db = SQLAlchemy(app)
