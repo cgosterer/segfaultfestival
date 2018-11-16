@@ -18,20 +18,28 @@ db = SQLAlchemy(app)
 
 app.config['SECRET_KEY'] = 'KJNF0128YURT08TN8G20TY0H0'
 
-posts = [
+posts = [						# most recent needs to be top post
+
+
+	 {
+                'author': 'Chris Osterer',
+                'title': 'New Search features!',
+                'content': 'We have added additional search features under the Artist and Concerts Pages!',
+                'date_posted': '18 November 2018'
+        },
 
 	{
-		'author': 'chris osterer',
-		'title': 'heelo py',
-		'content': 'the content',
-		'date_posted': '23 October 1992'
+		'author': 'Chris Osterer',
+		'title': 'Database Additions',
+		'content': 'We are please to anounce that we have added hundreds of your favorite artists to our site!',
+		'date_posted': '16 November 2018'
 	},
 
 	{
-                'author': 'chris bossterer',
-                'title': 'heelllllo pyo',
-                'content': 'the contentx',
-		'date_posted': '23 October 1992'
+                'author': 'Chris Osterer',
+                'title': 'FestivalFinder Grand Opening!',
+                'content': 'We are pleased to announce the Launching of FestivalFinder!',
+		'date_posted': '23 October 2018'
         }
 ]
 
@@ -53,6 +61,19 @@ def home():
 @app.route("/About")
 def about():
         return render_template('about.html', title = 'About')
+
+@app.route("/Contact")
+def contact():
+        return render_template('contact.html', title = 'Contact Us')
+
+
+@app.route("/Concerts")
+def concerts():
+        return render_template('concerts.html', posts = posts)
+
+@app.route("/Artists")
+def artists():
+        return render_template('artists.html', title = 'About')
 
 
 @app.route("/register", methods=['GET', 'POST'])
