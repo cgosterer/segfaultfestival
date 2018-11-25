@@ -1,6 +1,8 @@
 from flask import Flask, render_template, url_for, flash, redirect, request
 from forms import RegistrationForm, LoginForm
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
+from flask_table import Table, Col
 import flask_whooshalchemy as wa
 
 
@@ -13,12 +15,15 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://costerertestdb:Ik6N-wXc
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
 app.config['WHOOSH_BASE']='whoosh'
-db = SQLAlchemy(app)
+db = SQLAlchemy(app)						# final initialization step of the database db, db is now the database
 
 
-app.config['SECRET_KEY'] = 'KJNF0128YURT08TN8G20TY0H0'
+app.config['SECRET_KEY'] = 'KJNF0128YURT08TN8G20TY0H0'		# can be ignored for now serves no purpose yet
 
-posts = [						# most recent needs to be top post
+colors = ['red', 'blue', 'green', 'yellow']
+
+
+posts = [						# most recent needs to be top post, announcement posts
 
 
 	 {
@@ -44,17 +49,21 @@ posts = [						# most recent needs to be top post
 ]
 
 
-class testtable(db.Model):
+class Results(Table):
+	persname = Col('persname')
+
+
+class testtable(db.Model):					# we will have classes for each table, testtable is a single table with a persname column
 	__tablename__ = 'testtable'
-	__searchable__ = ['persname']				# names of columns that will be searchable
+	__searchable__ = ['persname']				# n ames of columns that will be searchable
 	persname = db.Column(db.String(255), primary_key=True)
 
-wa.whoosh_index(app, testtable) 					#Post is the name of the above class
+wa.whoosh_index(app, testtable) 					#Post is the name of the above class, this can be removed serves no purpose
 
 
 
 @app.route("/")
-@app.route("/Home")
+@app.route("/Home")						# 127.0.0.1/Home
 def home():
         return render_template('home.html', posts = posts)
 
@@ -67,9 +76,9 @@ def contact():
         return render_template('contact.html', title = 'Contact Us')
 
 
-@app.route("/Concerts")
-def concerts():
-        return render_template('concerts.html', posts = posts)
+@app.route("/Concerts", methods=['GET'])
+def concerts():								# search these by: zip ....
+        return render_template('concerts.html', posts = posts, colors=colors )
 
 @app.route("/Artists")
 def artists():
@@ -81,7 +90,7 @@ def register():
 	form = RegistrationForm()
 	if form.validate_on_submit():
 		flash(("Account Created for {form_username_data}").format(form_username_data=form.username.data), 'success')
-		return redirect(url_for('home'))
+		return redirect(url_for('home'))					# redirect to home pg on succesful log in
 	return render_template('register.html', title='Register', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -90,16 +99,25 @@ def login():
 	if form.validate_on_submit():
 		if form.email.data == 'admin@blog.com' and form.password.data == 'password':
 			flash('YOU have been logged in', 'success')
-			return redirect(url_for('home'))
+			return redirect(url_for('home'))				# redirect to home pg on succesful log in
 		else:
-			flash('Login Unsuccessful, Check username and password', 'danger')
+			flash('Login Unsuccessful, Check username and password', 'danger')	# log in error
 	return render_template('login.html', title='Login', form=form)
 
-@app.route('/search')
+@app.route('/search' , methods=['GET', 'POST'])
 def search():
-	#rows = testtable.query.whoosh_search(request.args.get('query'))		# this may not do what you think it does
-	rows = testtable.query.all()
-	return render_template('search.html', rows = rows)
+	if request.method == 'POST':
+		#rows = testtable.query.whoosh_search(request.args.get('query')).all()		# this may not do what you think it does
+		#rows = testtable.query.all()
+		formtext = request.form['query']
+		sqls = text('select * from testtable where persname="'+ formtext  +'";')					# text(<sequel query here>)
+		rows = db.engine.execute(sqls)							# gets the rows that match the search
+		table = Results(rows)
+		table.border= True
+		return render_template('search.html', table=table, posts=posts, colors=colors)		# displays rows and the colors list localhost/search
+	else:
+		return render_template('search.html', posts=posts, colors=colors) 
 
-if __name__ == '__main__':
+if __name__ == '__main__':								# main function
 	app.run(debug=True)
+

@@ -1,34 +1,36 @@
 {% extends "layout.html" %}
 {% block content %}
 
-	{% for row in rows %}
-    <tr>
-        <td>{{ row.persname }}</a></td>
-    </tr>
+        <h1>Search Artists By Name</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="query" id="query">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dropdown</title>
+    <h1>Search For Artists by Genre</h1>
+</head>
+<body>
+<select name=colors method="GET" action="/">
+    {% for color in colors %}
+    <option value= "{{color}}" SELECTED>{{color}}</option>"
     {% endfor %}
+</select>
 
+<br>
+<br>
 
+<div class="searchtable">
+        {{table}}
+        </div>
 
-
-	<div class="col-sm-3 col-sm-offset-1 blog-sidebar">
-	 <div class="sidebar-module sidebar-module-inset">
-	<h1>Search Page</h1>
-	 <form class="form-inline" method="GET" action="search">
-	   <div class="form-group">
-	    <label for="query">Name</label>
-		<input type="text" class="form-control" name="query" id="query">
-	     </div>
-		<button type="submit" class="btn btn-primary">Search</button>
-		</form>
-	     </div>
-	     </div>
-	 
-
-{% for row in rows %}
-    <tr>
-        <td>{{ row.persname }}</a></td>
-    </tr>
-    {% endfor %}	
+</body>
 
 
 {% endblock content %}
