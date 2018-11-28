@@ -1,7 +1,7 @@
 CREATE TABLE User (
 	username	VARCHAR(50) PRIMARY KEY,
 	email		VARCHAR(255),
-	hash		BIGINT UNSIGNED,
+	hash		CHAR(64),
 	salt		BIGINT UNSIGNED,
 	standing	BOOLEAN
 );
