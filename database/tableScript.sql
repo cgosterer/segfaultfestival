@@ -11,6 +11,7 @@ CREATE TABLE Band (
 	websiteURL	VARCHAR(255),
 	spotifyURL	VARCHAR(255),
 	founded		DATE,
+	genre		VARCHAR(255),
 	active		BOOLEAN
 );
 
@@ -28,6 +29,7 @@ CREATE TABLE Festival (
 	startDate	DATETIME,
 	location	VARCHAR(50),
 	websiteURL	VARCHAR(50),
+	zipCode		INT,
 	PRIMARY KEY (name, startDate)
 );
 
