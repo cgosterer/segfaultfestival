@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+        <h1>Search Festivals By Name</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="query" id="query">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dropdown</title>
+    <h1>Search For Festivals by Genre</h1>
+</head>
+<body>
+<select name=colors method="GET" action="/">
+    {% for color in colors %}
+    <option value= "{{color}}" SELECTED>{{color}}</option>"
+    {% endfor %}
+</select>
+
+<br>
+<br>
+
+<div class="searchtable">
+        {{table}}
+        </div>
+
+</body>
+
+
+{% endblock content %}
+
+
+
