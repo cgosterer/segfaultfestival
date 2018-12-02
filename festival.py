@@ -10,9 +10,9 @@ from flask_table import Table, Col
 from flask_bcrypt import Bcrypt
 from mysql.connector.cursor import MySQLCursorPrepared
 
-from ./accountAccess import checkExists, checkPassword, createAccount
+from accountAccess import checkExists, checkPassword, createAccount
 
-import flask_whooshalchemy as wa
+#import flask_whooshalchemy as wa
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://costerertestdb:Ik6N-wXcGo7_@den1.mysql6.gear.host/costerertestdb'
@@ -73,47 +73,47 @@ class Results(Table):				# these classes are used to form tables to be displayed
 
 class UserResults(Table):
 	username = Col('username')
-        email = Col('email')
-        standing = Col('standing')
+	email = Col('email')
+	standing = Col('standing')
 
 class bandResults(Table):
 	name = Col('name')
-        websiteURL = Col('websiteURL')
-        spotifyURL = Col('spotifyURL')
+	websiteURL = Col('websiteURL')
+	spotifyURL = Col('spotifyURL')
 	founded = Col('founded')
 	active = Col('active')
 
 class SongResults(Table):
-        songName = Col('songName')
-        bandName = Col('bandname')
-        album = Col('album')
-        runtime = Col('runtime')
+	songName = Col('songName')
+	bandName = Col('bandname')
+	album = Col('album')
+	runtime = Col('runtime')
 
 class festivalResults(Table):
 	name = Col('name')
-        startDate = Col('startDate')
-        location = Col('location')
-        websiteURL = Col('websiteURL')
+	startDate = Col('startDate')
+	location = Col('location')
+	websiteURL = Col('websiteURL')
 
 class festivalSchResults(Table):
 	festivalName = Col('festivalname')
-        festivalStart = Col('festivalStart')
-        bandName = Col('bandName')
-        performanceTime = Col('performanceTime')
+	festivalStart = Col('festivalStart')
+	bandName = Col('bandName')
+	performanceTime = Col('performanceTime')
 
 class favoritedSongs(Table):
 	user = Col('user')
-        song = Col('song')
-        band = Col('band')
-        album = Col('album')
+	song = Col('song')
+	band = Col('band')
+	album = Col('album')
 
 class BandModList(Table):
-        moderator = Col('moderator')
-        bandName = Col('bandName')
+	moderator = Col('moderator')
+	bandName = Col('bandName')
 
 class festModList(Table):
-        moderator = Col('moderator')
-        festivalName = Col('festivalName')
+	moderator = Col('moderator')
+	festivalName = Col('festivalName')
 
 class AdminList(Table):
 	username = Col('username')
