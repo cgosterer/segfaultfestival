@@ -30,6 +30,12 @@ colors = ['red', 'blue', 'green', 'yellow']
 
 posts = [						# most recent needs to be top post, announcement posts
 
+	 {
+                'author': 'Chris Osterer',
+                'title': 'Event Photos!',
+                'content': 'Photos from our recent events can be found below!',
+                'date_posted': '30 November 2018'
+        },
 
 	 {
                 'author': 'Chris Osterer',
