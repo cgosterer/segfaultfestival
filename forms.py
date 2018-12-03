@@ -15,3 +15,11 @@ class LoginForm(FlaskForm):
 	remember = BooleanField('Remember Me')
 	submit = SubmitField('Login')
 
+class ModRegistrationForm(FlaskForm):
+        username = StringField('Username', validators=[DataRequired(), Length(min=2, max=40)])
+        email = StringField('Email', validators=[DataRequired(), Email()])
+	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max = 50)])
+        password = PasswordField('Password', validators=[DataRequired()])
+        confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+        submit = SubmitField('Sign UP')
+

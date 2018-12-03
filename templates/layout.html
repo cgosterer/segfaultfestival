@@ -39,8 +39,14 @@
         </div>
         <!-- Navbar Right Side -->
         <div class="navbar-nav">
+	  {% if isLogged and isMod == 0 %}
+	  <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout: {{startuser}}</a>
+	  {% elif isLogged and isMod %}
+	  <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout: {{startuser}} (Moderator)</a>
+	  {% else %}
           <a class="nav-item nav-link" href="{{url_for('login')}}">Login</a>
           <a class="nav-item nav-link" href="{{url_for('register')}}">Register</a>
+	  {% endif %}
         </div>
       </div>
     </div>
@@ -63,13 +69,13 @@
     </div>
     <div class="col-md-4">
       <div class="content-section">
-        <h3>Our Sidebar</h3>
-        <p class='text-muted'>You can put any information here you'd like.
+        <h3>Chosen Event</h3>
+        <p class='text-muted'>Our choice of Upcoming Event.
           <ul class="list-group">
-            <li class="list-group-item list-group-item-light">Latest Posts</li>
-            <li class="list-group-item list-group-item-light">Announcements</li>
-            <li class="list-group-item list-group-item-light">Calendars</li>
-            <li class="list-group-item list-group-item-light">etc</li>
+            <li class="list-group-item list-group-item-light">Groove Cruise Miami 2019</li>
+            <li class="list-group-item list-group-item-light">Miami, FL</li>
+            <li class="list-group-item list-group-item-light">January 10-14 2019</li>
+            <li class="list-group-item list-group-item-light">Headliner: Kaskade</li>
           </ul>
         </p>
       </div>
