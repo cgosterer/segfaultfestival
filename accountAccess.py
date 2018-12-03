@@ -20,7 +20,7 @@ def createAccount(connection, username, password, email):
 #    print("Generated Salt", s)
     h = hashSalt(password, s)
 #    print("The hash is", h)
-    cursor.execute(statement, (username, email, h, s, 'True'))
+    cursor.execute(statement, (username, email, h, s, 1))
     connection.commit()
     cursor.close()
     return True

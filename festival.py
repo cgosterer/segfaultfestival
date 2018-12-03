@@ -3,50 +3,49 @@ import random
 import time
 from hashlib import sha256 as userHash
 from flask import Flask, render_template, url_for, flash, redirect, request
-from forms import RegistrationForm, LoginForm
+from forms import RegistrationForm, LoginForm, ModRegistrationForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from flask_table import Table, Col
-from flask_bcrypt import Bcrypt
+#from flask_bcrypt import Bcrypt
 from mysql.connector.cursor import MySQLCursorPrepared
-
 from accountAccess import checkExists, checkPassword, createAccount
-
 #import flask_whooshalchemy as wa
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://costerertestdb:Ik6N-wXcGo7_@den1.mysql6.gear.host/costerertestdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://dbtest4020:Pp0gHfo-~149@den1.mysql1.gear.host/dbtest4020'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
-app.config['WHOOSH_BASE']='whoosh'
+#app.config['WHOOSH_BASE']='whoosh'
 app.config['SECRET_KEY'] = 'KJNF0128YURT08TN8G20TY0H0'          # can be ignored for now serves no purpose yet
 
 db = SQLAlchemy(app)						# final initialization step of the database db, db is now the database
-bcrypt = Bcrypt(app)
+#bcrypt = Bcrypt(app)
+cnx = mysql.connector.connect(user='dbtest4020', password='Pp0gHfo-~149', host='den1.mysql1.gear.host', database='dbtest4020', use_pure=True)
+genres = ['Rock', 'Metal', 'Country', 'Electronic', 'Blues', 'Dance', 'Hip-Hop/Rap']
 
-cnx = mysql.connector.connect(user='costerertestdb', password='Ik6N-wXcGo7_', host='den1.mysql6.gear.host', database='costerertestdb', use_pure=True)
-
-
-
-colors = ['red', 'blue', 'green', 'yellow']
-
+loggedin=0						# int flags to see if someone is logged in or not 1 logged in 0 not logged in
+ismod=0							# int flag to mark if they are moderator or not 1 is 0 isnt
+startuser = "Not Logged In"
 
 posts = [						# most recent needs to be top post, announcement posts
-
-
+	 {
+                'author': 'Chris Osterer',
+                'title': 'Event Photos!',
+                'content': 'Photos from our recent events can be found below!',
+                'date_posted': '30 November 2018'
+        },
 	 {
                 'author': 'Chris Osterer',
                 'title': 'New Search features!',
                 'content': 'We have added additional search features under the Artist and Concerts Pages!',
                 'date_posted': '18 November 2018'
         },
-
 	{
 		'author': 'Chris Osterer',
 		'title': 'Database Additions',
 		'content': 'We are please to anounce that we have added hundreds of your favorite artists to our site!',
 		'date_posted': '16 November 2018'
 	},
-
 	{
                 'author': 'Chris Osterer',
                 'title': 'FestivalFinder Grand Opening!',
@@ -54,17 +53,6 @@ posts = [						# most recent needs to be top post, announcement posts
 		'date_posted': '23 October 2018'
         }
 ]
-
-#class User(db.Model):								# this probably wont be needed
-	#username = db.column(db.string(50), unique=True, nullable = False)
-	#email = db.column(db.string(255), unique=False, nullable = False)
-	#hash = db.column(db.string(64), unique=False, nullable = False)
-	#salt = db.column(db.Integer,unique= False, nullable=False)
-	#standing= db.column(db.Boolean,unqiue = False, nullable = False)
-
-	#def __repr__(self):
-		#return f"User('{self.username}', '{self.email}')"
-
 
 class Results(Table):				# these classes are used to form tables to be displayed on webpage based on sql queries by web page users
 	artistsname = Col('artistsanme')
@@ -81,6 +69,7 @@ class bandResults(Table):
 	websiteURL = Col('websiteURL')
 	spotifyURL = Col('spotifyURL')
 	founded = Col('founded')
+	genre=Col('genre')
 	active = Col('active')
 
 class SongResults(Table):
@@ -119,51 +108,66 @@ class AdminList(Table):
 	username = Col('username')
 
 @app.route("/")
-@app.route("/Home")						# 127.0.0.1/Home
+@app.route("/Home")										# 127.0.0.1/Home
 def home():
-        return render_template('home.html', posts = posts)
+        return render_template('home.html', posts = posts, isLogged=loggedin, startuser = startuser, isMod=ismod)
 
 @app.route("/About")
 def about():
-        return render_template('about.html', title = 'About')
+        return render_template('about.html', title = 'About', isLogged=loggedin, startuser= startuser, isMod = ismod)
 
 @app.route("/Contact")
 def contact():
-        return render_template('contact.html', title = 'Contact Us')
-
+        return render_template('contact.html', title = 'Contact Us', isLogged=loggedin, startuser = startuser, isMod=ismod)
 
 @app.route("/Festivals", methods=['GET', 'POST'])
-def festivals():								# search these by: zip ....
+def festivals():										# search these by: zip ....
 	if request.method == 'POST':
-		#rows = testtable.query.whoosh_search(request.args.get('query')).all()          # this may not do what you think it does
-		#rows = testtable.query.all()
-		formtext = request.form['query']
-		#sqls = text('select * from testtable where persname="'+ formtext  +'";')                                       # text(<sequel query here>)
-		sqls = text('select * from artists;')                                       # text(<sequel query here>)
+		formtext = request.form['zipquery']
+		#sqls = text('select * from testtable where persname="'+ formtext  +'";')       # text(<sequel query here>)
+		sqls = text('select * from artists;')                                       	# text(<sequel query here>)
 		rows = db.engine.execute(sqls)                                                  # gets the rows that match the search
 		table = Results(rows)
 		#table = bandResults(rows)
 		table.border= True
-		return render_template('festivals.html', table=table, posts=posts, colors=colors)          # displays rows and the colors list localhost/search
+		return render_template('festivals.html', table=table, posts=posts, genres=genres, isLogged=loggedin, isMod=ismod)          # displays rows and the colors list localhost/search
 	else:
-		return render_template('festivals.html', posts=posts, colors=colors) 
+		return render_template('festivals.html', posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 
 
-@app.route("/Bands", methods= ['GET','POST'])
+@app.route("/Bands", methods= ['GET','POST'])										      # should show two different pages one for regtular user na done for mods
 def bands():
-	if request.method == 'POST':
-		#rows = testtable.query.whoosh_search(request.args.get('query')).all()          # this may not do what you think it does
-		#rows = testtable.query.all()
-		formtext = request.form['query']
-		#sqls = text('select * from testtable where persname="'+ formtext  +'";')                                       # text(<sequel query here>)
-		sqls = text('select * from artists;')                                       # text(<sequel query here>)
-		rows = db.engine.execute(sqls)                                                  # gets the rows that match the search
-		table = Results(rows)
-		#table = bandResults(rows)
-		table.border= True
-		return render_template('bands.html', table=table, posts=posts, colors=colors)          # displays rows and the colors list localhost/search
+	global startuser
+	global loggedin
+	global ismod
+	form = ModRegistrationForm()
+	if(ismod):
+		if form.validate_on_submit():
+			if(createAccount(cnx, form.username.data, form.password.data, form.email.data)):
+				flash('Your account has been created! You may now log in!', 'success')
+			else:
+				flash('Error Creating Account, Please Retry with Different Username', 'success')
+				#return redirect(url_for('home'))
+			return render_template('modbands.html', posts=posts, form = form, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)													      # actions for a  mod
+		else:
+			if request.method == 'POST':                                                                                  # if they fill out a text field
+				formtext = request.form['query']
+				sqls = text('select * from Band where name="'+ formtext  +'";')                                       # text(<sequel query here>)
+				rows = db.engine.execute(sqls)                                                                        # gets the rows that match the search
+				table = bandResults(rows)
+				table.border= True
+				return render_template('modbands.html', table=table, form=form, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)              # displays rows and $
+			return render_template('modbands.html', form=form, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 	else:
-		return render_template('bands.html', posts=posts, colors=colors) 
+		if request.method == 'POST':										      # if they fill out a text field
+			formtext = request.form['query']
+			sqls = text('select * from Band where name="'+ formtext  +'";')                                       # text(<sequel query here>)
+			rows = db.engine.execute(sqls)                                                  		      # gets the rows that match the search
+			table = bandResults(rows)
+			table.border= True
+			return render_template('bands.html', table=table, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)          	# displays rows and the colors list localhost/search
+		else:
+			return render_template('bands.html', posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -173,23 +177,37 @@ def register():
 			flash('Your account has been created! You may now log in!', 'success')
 		else:
 			flash('Error Creating Account, Please Retry with Different Username', 'success')
-
-		return redirect(url_for('home'))					# redirect to home pg on succesful log in
-	return render_template('register.html', title='Register', form=form)
+		return redirect(url_for('home'))											# redirect to home pg on succesful log in
+	return render_template('register.html', title='Register', form=form, isLogged=loggedin, startuser = startuser, isMod=ismod )
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+	global loggedin
+	global startuser
+	global ismod
 	form = LoginForm()
 	if form.validate_on_submit():
 		if (checkPassword(cnx, form.username.data, form.password.data)):
 			flash('YOU have been logged in', 'success')
-			return redirect(url_for('home'))				# redirect to home pg on succesful log in
+			loggedin = 1
+			if(form.username.data == "ccc"):								# should check for moderator here
+				ismod=1
+			startuser = form.username.data                                                                  # set the startuser to the name they type in for suername
+			return redirect(url_for('home'))								# redirect to home pg on succesful log in
 		else:
-			flash('Login Unsuccessful, Check username and password', 'danger')	# log in error
-	return render_template('login.html', title='Login', form=form)
+			flash('Login Unsuccessful, Check username and password', 'danger')				# log in error
+	return render_template('login.html', title='Login', form=form, isLogged=loggedin, startuser = startuser, isMod=ismod)
 
+@app.route("/logout")
+def logout():
+	global ismod
+	global loggedin
+	global startuser
+	startuser = "Not Logged In"
+	loggedin = 0
+	ismod=0
+	return redirect(url_for('home'))
 
-
-if __name__ == '__main__':								# main function
+if __name__ == '__main__':
 	app.run(debug=True)
 

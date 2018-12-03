@@ -19,20 +19,15 @@
 </head>
 <body>
 <select name=colors method="GET" action="/">
-    {% for color in colors %}
-    <option value= "{{color}}" SELECTED>{{color}}</option>"
+    {% for genre in genres %}
+    <option value= "{{genre}}" SELECTED>{{genre}}</option>"
     {% endfor %}
 </select>
-
-<br>
-<br>
-
-<div class="searchtable">
-        {{table}}
-        </div>
-
 </body>
 
+<p><br><br><br><br><br></p>
+<p><br><br><br><br><br></p>
+        {{table}}
 
 {% endblock content %}
 
