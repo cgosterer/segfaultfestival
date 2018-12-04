@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block content %}
+
+	<div class="content-section2">
+                <form method="POST" action="">
+                {{usersongform.hidden_tag()}}
+                <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Add A Song To Your Favorites List!</legend>
+                <div class="form-group">
+                {{usersongform.songname.label(class="form-control-label")}}
+                {% if usersongform.songname.errors %}
+                        {{ usersongform.songname(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in usersongform.songname.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{usersongform.songname(class="form-control form-control-lg")}}
+                {% endif %}
+                </div>
+
+                <div class="form-group">
+                {{usersongform.bandname.label(class="form-control-label")}}
+                {% if usersongform.bandname.errors %}
+                        {{ usersongform.bandname(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in  usersongform.bandname.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{usersongform.bandname(class="form-control form-control-lg")}}
+                {% endif %}
+                </div>
+
+                <div class="form-group">
+                {{usersongform.album.label(class="form-control-label")}}
+                {% if usersongform.album.errors %}
+                        {{ usersongform.album(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in  usersongform.album.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{usersongform.album(class="form-control form-control-lg")}}
+                {% endif %}
+
+		</div>
+
+                </fieldset>
+                <div class="from-group">
+                {{usersongform.submit(class="btn btn-outline-info")}}
+
+                </div>
+	</form>
+	</div>
+	<div class="border-top pt-3">
+	<small class="text-muted">
+		Already Have an Account? <a class="ml-2" href="{{url_for('login')}}"> Sign In</a>
+	</small>
+	
+	</div>
+
+
+
+<h2>Search Songs By Name</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="namequery" id="namequery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<h2>Search Songs By Band Name</h2>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="bandquery" id="bandquery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<h2>Search Songs By Album Name</h3>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="albumquery" id="albumquery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<p><br><br><br></p>
+
+        {{nametable}}
+
+<p><br><br><br></p>
+
+        {{bandtable}}
+<p><br><br><br></p>
+
+        {{albumtable}}
+<p><br></p>
+<img src="https://d265059lu1u7jc.cloudfront.net/site/uploads/2018/03/HeaderImageB.jpg" alt="filler text">
+{% endblock content %}
+
+

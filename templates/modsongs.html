@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% block content %}
+
+	<div class="content-section2">
+                <form method="POST" action="">
+                {{songform.hidden_tag()}}
+                <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Add A song</legend>
+                <div class="form-group">
+                {{songform.songname.label(class="form-control-label")}}
+                {% if songform.songname.errors %}
+                        {{ songform.songname(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in  songform.songname.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{songform.songname(class="form-control form-control-lg")}}
+                {% endif %}
+                </div>
+
+                <div class="form-group">
+                {{songform.bandname.label(class="form-control-label")}}
+                {% if songform.bandname.errors %}
+                        {{ songform.bandname(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in  songform.bandname.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{songform.bandname(class="form-control form-control-lg")}}
+                {% endif %}
+                </div>
+
+		 <div class="form-group">
+                {{songform.album.label(class="form-control-label")}}
+                {% if songform.album.errors %}
+                        {{ songform.album(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in  songform.album.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{songform.album(class="form-control form-control-lg")}}
+                {% endif %}
+
+                <div class="form-group">
+                {{songform.runTime.label(class="form-control-label")}}
+                {% if songform.runTime.errors %}
+                        {{ songform.runTime(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in  songform.runTime.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{songform.runTime(class="form-control form-control-lg")}}
+                {% endif %}
+
+		</div>
+
+                </fieldset>
+                <div class="from-group">
+                {{songform.submit(class="btn btn-outline-info")}}
+
+                </div>
+	</form>
+	</div>
+	<div class="border-top pt-3">
+	<small class="text-muted">
+		Already Have an Account? <a class="ml-2" href="{{url_for('login')}}"> Sign In</a>
+	</small>
+	
+	</div>
+
+
+
+ <h2>Search Songs By Name</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="namequery" id="namequery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<h2>Search Songs By band</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="bandquery" id="bandquery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+
+<h2>Search Songs By Album</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Name &nbsp </label>
+                <input type="text" class="form-control" name="albumquery" id="albumquery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+<p><br><br></p>
+	{{nametable}}
+<p><br><br></p>
+	{{bandtable}}
+<p><br><br></p>
+        {{albumtable}}
+<p><br><br></p>
+<img src="https://d265059lu1u7jc.cloudfront.net/site/uploads/2018/03/HeaderImageB.jpg" alt="filler text">
+{% endblock content %}
+
+

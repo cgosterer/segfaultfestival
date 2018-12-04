@@ -3,19 +3,19 @@ import random
 import time
 from hashlib import sha256 as userHash
 from flask import Flask, render_template, url_for, flash, redirect, request
-from forms import RegistrationForm, LoginForm, ModRegistrationForm
+from forms import RegistrationForm, LoginForm, ModRegistrationForm, SongForm, UserSongForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from flask_table import Table, Col
-#from flask_bcrypt import Bcrypt
+#from flask_bcrypt import Bcrypt				# not using this in this version, using stevens hash and salt methods from hashlib
 from mysql.connector.cursor import MySQLCursorPrepared
 from accountAccess import checkExists, checkPassword, createAccount
-#import flask_whooshalchemy as wa
+#import flask_whooshalchemy as wa				# not suing this in this version
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://dbtest4020:Pp0gHfo-~149@den1.mysql1.gear.host/dbtest4020'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=True
-#app.config['WHOOSH_BASE']='whoosh'
+#app.config['WHOOSH_BASE']='whoosh'				# not using whoosh in this version
 app.config['SECRET_KEY'] = 'KJNF0128YURT08TN8G20TY0H0'          # can be ignored for now serves no purpose yet
 
 db = SQLAlchemy(app)						# final initialization step of the database db, db is now the database
@@ -37,7 +37,7 @@ posts = [						# most recent needs to be top post, announcement posts
 	 {
                 'author': 'Chris Osterer',
                 'title': 'New Search features!',
-                'content': 'We have added additional search features under the Artist and Concerts Pages!',
+                'content': 'We have added additional search features under the Bands, Concerts, and Festivals Pages!',
                 'date_posted': '18 November 2018'
         },
 	{
@@ -76,7 +76,7 @@ class SongResults(Table):
 	songName = Col('songName')
 	bandName = Col('bandname')
 	album = Col('album')
-	runtime = Col('runtime')
+	#runtime = Col('runtime')		# This Will crash the program if attempted to be acquired from an sql query so we cannot display runtimes will fix  if more important things are done
 
 class festivalResults(Table):
 	name = Col('name')
@@ -140,7 +140,7 @@ def bands():
 	global startuser
 	global loggedin
 	global ismod
-	form = ModRegistrationForm()
+	form = ModRegistrationForm()									# the forms displayed on the mod pages
 	if(ismod):
 		if form.validate_on_submit():
 			if(createAccount(cnx, form.username.data, form.password.data, form.email.data)):
@@ -148,7 +148,7 @@ def bands():
 			else:
 				flash('Error Creating Account, Please Retry with Different Username', 'success')
 				#return redirect(url_for('home'))
-			return render_template('modbands.html', posts=posts, form = form, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)													      # actions for a  mod
+			return render_template('modbands.html', posts=posts, form = form, songform=songform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)													      # actions for a  mod
 		else:
 			if request.method == 'POST':                                                                                  # if they fill out a text field
 				formtext = request.form['query']
@@ -156,8 +156,8 @@ def bands():
 				rows = db.engine.execute(sqls)                                                                        # gets the rows that match the search
 				table = bandResults(rows)
 				table.border= True
-				return render_template('modbands.html', table=table, form=form, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)              # displays rows and $
-			return render_template('modbands.html', form=form, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+				return render_template('modbands.html', table=table, form=form, songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)              # displays rows and $
+			return render_template('modbands.html', form=form, songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 	else:
 		if request.method == 'POST':										      # if they fill out a text field
 			formtext = request.form['query']
@@ -168,6 +168,100 @@ def bands():
 			return render_template('bands.html', table=table, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)          	# displays rows and the colors list localhost/search
 		else:
 			return render_template('bands.html', posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+
+@app.route("/Songs", methods= ['GET','POST'])
+def songs():
+	global startuser
+	global loggedin
+	global ismod
+	songform = SongForm()										# creates a song for a band from a moderator
+	usersongform= UserSongForm()
+	if(ismod):
+		if songform.validate_on_submit():
+			#if(createsong(songform.songname.data, songfrom.bandname.data, songform.album.data, songform.runTime.data)):  if error with runtime just change to generic value
+			flash('Your Song has been created!', 'success')					# tab over whne fixed
+			#else():									# if create favorite song fails
+				#flash('Error Creating Song Please retry', 'danger')
+			return render_template('modsongs.html', posts=posts, songform=songform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+		else:
+			if request.method == 'POST':
+				nametext = request.form.get('namequery')
+				bandtext = request.form.get('bandquery')
+				albumtext = request.form.get('albumquery')
+				nameq = text('select songName, bandName, album from Song where songName="songnameinourdbtest4020databse";')     # this will never happen can use to get empty result
+				namerows = db.engine.execute(nameq)
+				nametable = SongResults(namerows)
+				nametable.border= True
+				bandq = text('select songName, bandName, album from Song where bandName="songnameinourdbtest4020databse";')
+				bandrows = db.engine.execute(bandq)
+				bandtable = SongResults(bandrows)
+				bandtable.border= True
+				albumq =text('select songName, bandName, album from Song where album="songnameinourdbtest4020databse";')        # if someone names an album this i will eat a shoe
+				albumrows = db.engine.execute(albumq)
+				albumtable = SongResults(albumrows)
+				albumtable.border= True
+
+				if(nametext):
+					nameq = text('select songName, bandName, album from Song where songName="'+ nametext  +'";')
+					namerows = db.engine.execute(nameq)
+					nametable = SongResults(namerows)
+					nametable.border= True
+				if(bandtext):
+					bandq = text('select songName, bandName, album from Song where bandName="'+ bandtext  +'";')
+					bandrows = db.engine.execute(bandq)
+					bandtable = SongResults(bandrows)
+					bandtable.border= True
+				if(albumtext):
+					albumq =text('select songName, bandName, album from Song where album="'+ albumtext  +'";')
+					albumrows = db.engine.execute(albumq)
+					albumtable = SongResults(albumrows)
+					albumtable.border= True
+				return render_template('modsongs.html', nametable=nametable, bandtable=bandtable, albumtable=albumtable, songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+			else:
+				return render_template('modsongs.html', songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+	else:
+		if usersongform.validate_on_submit():
+			#if(createfavsong(startuser, usersongform.songname.data, usersongform.bandname.data, songform.album.data)):
+				#flash('Song added to favorites List!', 'success')
+			#else():									# create fav song fails
+				#flash('Error Adding Favorite Song Please retry', 'danger')
+			return render_template('songs.html', posts=posts, usersongform=usersongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+		if request.method == 'POST':								# if they used one of the text searches
+			nametext = request.form.get('namequery')
+			bandtext = request.form.get('bandquery')
+			albumtext = request.form.get('albumquery')
+
+			nameq = text('select songName, bandName, album from Song where songName="songnameinourdbtest4020databse";')	# this will never happen can use to get empty result
+			namerows = db.engine.execute(nameq)
+			nametable = SongResults(namerows)
+			nametable.border= True
+			bandq = text('select songName, bandName, album from Song where bandName="songnameinourdbtest4020databse";')
+			bandrows = db.engine.execute(bandq)
+			bandtable = SongResults(bandrows)
+			bandtable.border= True
+			albumq =text('select songName, bandName, album from Song where album="songnameinourdbtest4020databse";')	# if someone names an album this i will eat a shoe
+			albumrows = db.engine.execute(albumq)
+			albumtable = SongResults(albumrows)
+			albumtable.border= True
+
+			if(nametext):
+				nameq = text('select songName, bandName, album from Song where songName="'+ nametext  +'";')
+				namerows = db.engine.execute(nameq)
+				nametable = SongResults(namerows)
+				nametable.border= True
+			if(bandtext):
+				bandq = text('select songName, bandName, album from Song where bandName="'+ bandtext  +'";')
+				bandrows = db.engine.execute(bandq)
+				bandtable = SongResults(bandrows)
+				bandtable.border= True
+			if(albumtext):
+				albumq =text('select songName, bandName, album from Song where album="'+ albumtext  +'";')
+				albumrows = db.engine.execute(albumq)
+				albumtable = SongResults(albumrows)
+				albumtable.border= True
+			return render_template('songs.html', usersongform=usersongform, nametable=nametable, bandtable=bandtable, albumtable=albumtable, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) # displays page with table
+		else:
+			return render_template('songs.html', usersongform=usersongform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) #displays page without the table as no table has been created yet
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -190,13 +284,13 @@ def login():
 		if (checkPassword(cnx, form.username.data, form.password.data)):
 			flash('YOU have been logged in', 'success')
 			loggedin = 1
-			if(form.username.data == "ccc"):								# should check for moderator here
-				ismod=1
+			if(form.username.data == "ccc"):								# should check for moderator here with function that we create
+				ismod=1											# can still set this too one if they are a mod
 			startuser = form.username.data                                                                  # set the startuser to the name they type in for suername
 			return redirect(url_for('home'))								# redirect to home pg on succesful log in
 		else:
 			flash('Login Unsuccessful, Check username and password', 'danger')				# log in error
-	return render_template('login.html', title='Login', form=form, isLogged=loggedin, startuser = startuser, isMod=ismod)
+	return render_template('login.html', title='Login', form=form, isLogged=loggedin, startuser = startuser, isMod=ismod)			# taked us back to login page
 
 @app.route("/logout")
 def logout():
