@@ -42,6 +42,13 @@ CREATE TABLE FestivalSchedule (
 	FOREIGN KEY(bandName) REFERENCES Band(name)
 );
 
+CREATE TABLE bandLikes(
+	bandName	VARCHAR(50),
+	username	VARCHAR(50),
+	FOREIGN KEY(bandName) REFERENCES Band(name),
+	FOREIGN KEY(username) REFERENCES User(username)
+);
+
 CREATE TABLE FavoritedSongs (
 	user	VARCHAR(50) REFERENCES User(username),
 	song	VARCHAR(50),
