@@ -28,7 +28,7 @@ def setActive(connection, band):
     cursor.close()
     connection.commit()
 
-def setActive(connection, band):
+def setInactive(connection, band):
     cursor = connection.cursor(prepared=True)
     statement = "UPDATE Band SET active=False WHERE bandName=%s;"
     cursor.execute(statement, (band,))
@@ -48,3 +48,17 @@ def removeMod(connection, band, user):
     cursor.execute(statement, (band, user))
     cursor.close()
     connection.commit()
+
+def setSpotify(connection, band, url):
+    cursor = connection.cursor(prepared=True)
+    statement = "UPDATE Band SET spotifyURL=%s WHERE bandName=%s;"
+    cursor.execute(statement, (url, band))
+    connection.commit()
+    cursor.close()
+
+def setWebsite(connection, band, url):
+    cursor = connection.cursor(prepared=True)
+    statement = "UPDATE Band SET websiteURL=%s WHERE bandName=%s;"
+    cursor.execute(statement, (url, band))
+    connection.commit()
+    cursor.close()
