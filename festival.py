@@ -80,9 +80,10 @@ class SongResults(Table):
 
 class festivalResults(Table):
 	name = Col('name')
-	startDate = Col('startDate')
+	#startDate = Col('startDate')
 	location = Col('location')
 	websiteURL = Col('websiteURL')
+	zipCode = Col('zipCode')
 
 class festivalSchResults(Table):
 	festivalName = Col('festivalname')
@@ -123,14 +124,41 @@ def contact():
 @app.route("/Festivals", methods=['GET', 'POST'])
 def festivals():										# search these by: zip ....
 	if request.method == 'POST':
-		formtext = request.form['zipquery']
-		#sqls = text('select * from testtable where persname="'+ formtext  +'";')       # text(<sequel query here>)
-		sqls = text('select * from artists;')                                       	# text(<sequel query here>)
-		rows = db.engine.execute(sqls)                                                  # gets the rows that match the search
-		table = Results(rows)
-		#table = bandResults(rows)
-		table.border= True
-		return render_template('festivals.html', table=table, posts=posts, genres=genres, isLogged=loggedin, isMod=ismod)          # displays rows and the colors list localhost/search
+		nametext = request.form.get('namequery')
+		ziptext = request.form.get('zipquery')
+		citytext = request.form.get('cityquery')
+
+		# the following block is desinged to return empty tables
+		nameq = text('select songName, bandName, album from Song where songName="songnameinourdbtest4020databse";')     # this will never happen can use to get empty result
+		namerows = db.engine.execute(nameq)
+		nametable = SongResults(namerows)
+		nametable.border= True
+		zipq = text('select songName, bandName, album from Song where bandName="songnameinourdbtest4020databse";')
+		ziprows = db.engine.execute(zipq)
+		ziptable = SongResults(ziprows)
+		ziptable.border= True
+		cityq =text('select songName, bandName, album from Song where album="songnameinourdbtest4020databse";')        # if someone names an album this i will eat a shoe
+		cityrows = db.engine.execute(cityq)
+		citytable = SongResults(cityrows)
+		citytable.border= True
+		# empty tables have been formed as of this line
+
+		if(nametext):
+			nameq = text('select name, location, websiteURL, zipCode from Festival where name="'+ nametext  +'";')
+			namerows = db.engine.execute(nameq)
+			nametable = festivalResults(namerows)
+			nametable.border= True
+		if(ziptext):
+			zipq = text('select name, location, websiteURL, zipCode from Festival where zipcode="'+ ziptext  +'";') # this may be wrong as zip is stored as an int
+			ziprows = db.engine.execute(zipq)
+			ziptable = festivalResults(ziprows)
+			ziptable.border= True
+		if(citytext):
+			cityq =text('select name, location, websiteURL, zipCode from Festival where location="'+ citytext  +'";')
+			cityrows = db.engine.execute(cityq)
+			citytable = festivalResults(cityrows)
+			citytable.border= True
+		return render_template('festivals.html', ziptable=ziptable, citytable=citytable, nametable=nametable, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 	else:
 		return render_template('festivals.html', posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 

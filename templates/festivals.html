@@ -2,16 +2,16 @@
 
 {% block content %}
 
-        <h1>Search Festivals By Name</h1>
+        <h2>Search Festivals By Name</h1>
          <form class="form-inline" method="POST">
            <div class="form-group">
             <label for="query">Name &nbsp </label>
-                <input type="text" class="form-control" name="query" id="query">
+                <input type="text" class="form-control" name="namequery" id="namequery">
              </div>
                 <button type="submit" class="btn btn-primary">Search</button>
                 </form>
 
-	 <h1>Search Festivals By Zip Code</h1>
+	 <h2>Search Festivals By Zip Code</h1>
          <form class="form-inline" method="POST">
            <div class="form-group">
             <label for="query">Zip &nbsp</label>
@@ -20,26 +20,23 @@
                 <button type="submit" class="btn btn-primary">Search</button>
                 </form>
 
+	 <h2>Search Festivals By City Name</h1>
+         <form class="form-inline" method="POST">
+           <div class="form-group">
+            <label for="query">Zip &nbsp</label>
+                <input type="text" class="form-control" name="cityquery" id="cityquery">
+             </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+                </form>
 
-
-<br>
-<br>
-
-<div class="searchtable">
-        {{table}}
-</div>
-
-</body>
-<p><br></p>
-<p><br></p>
-<p><br></p>
-<p><br></p>
-<p><br></p>
-<p><br></p>
+	<p><br></p>
+        {{nametable}}
+	 <p><br></p>
+	{{ziptable}}
+	 <p><br></p>
+	{{citytable}}	
+	<p><br></p>
 <img src="https://d265059lu1u7jc.cloudfront.net/site/uploads/2018/03/HeaderImageB.jpg" alt="filler text">
-<p><br></p>
-
-
 {% endblock content %}
 
 
