@@ -17,10 +17,15 @@ def like(connection, band, user):
 	cursor = connection.cursor(prepared=True)
 	statement = "INSERT INTO bandLikes(bandName, username) VALUES(%s, %s);"
 	check = "SELECT * FROM Band WHERE name=%s;"
+	check2 = "SELECT * FROM bandLikes WHERE bandName=%s AND username=%s;"
 	cursor.execute(check, (band,))
 	canExec = False
 	for data in cursor:
 		canExec = True
+	if canExec:
+		cursor.execute(check2, (band, user))
+		for data in cursor:
+			canExec = False
 	if canExec:
 		print('executing like')
 		cursor.execute(statement, (band, user))
