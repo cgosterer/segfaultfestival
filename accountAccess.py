@@ -2,6 +2,7 @@ import mysql.connector
 import random
 import time
 from hashlib import sha256 as userHash
+from tryAction import tryAction
 
 def hashSalt(password, salt):
     saltedPassword = password + str(salt)
@@ -9,6 +10,7 @@ def hashSalt(password, salt):
     h = hasher.hexdigest()
     return h
 
+@tryAction
 def createAccount(connection, username, password, email):
     if(checkExists(connection, username) == True):
         return False
@@ -25,14 +27,19 @@ def createAccount(connection, username, password, email):
     cursor.close()
     return True
     
+@tryAction
 def checkPassword(connection, username, password):
     cursor = connection.cursor(prepared=True)
     select = "SELECT * FROM User WHERE username=%s AND hash=%s"
     getHash = "SELECT salt FROM User WHERE username=%s"
     cursor.execute(getHash, (username,))
     salt = 0
+    fail = True
     for data in cursor:
         salt = data[0]
+        fail = False
+    if fail:
+        return False
 #        print("Grabbed salt: ", salt)
     h = hashSalt(password, salt)
 #    print("The hash is", h)
@@ -43,6 +50,7 @@ def checkPassword(connection, username, password):
     cursor.close()
     return val
     
+@tryAction
 def checkExists(connection, username):
     cursor = connection.cursor(prepared=True)
     statement = "SELECT * FROM User WHERE username=%s"
