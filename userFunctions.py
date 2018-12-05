@@ -19,12 +19,12 @@ def like(connection, band, user):
     check = "SELECT * FROM Band WHERE name=%s;"
     cursor.execute(check, (band,))
     for data in cursor:
+        cursor.execute(statement, (band, user))
+        connection.commit()
         cursor.close()
-        return False
-    cursor.execute(statement, (band, user))
-    connection.commit()
+        return True
     cursor.close()
-    return True
+    return False
 
 @tryAction
 def likeSong(connection, user, song, band, album):
@@ -33,12 +33,12 @@ def likeSong(connection, user, song, band, album):
     check = "SELECT * FROM Song WHERE songName=%s AND bandName=%s AND album=%s;"
     cursor.execute(check, (song, band, album))
     for data in cursor:
+        cursor.execute(statement, user, song, band, album)
+        connection.commit()
         cursor.close()
-        return False
-    cursor.execute(statement, user, song, band, album)
-    connection.commit()
+        return True
     cursor.close()
-    return True
+    return False
 
 @tryAction
 def unlinkeBand(connection, user, band):
