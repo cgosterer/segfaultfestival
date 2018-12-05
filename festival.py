@@ -3,13 +3,14 @@ import random
 import time
 from hashlib import sha256 as userHash
 from flask import Flask, render_template, url_for, flash, redirect, request
-from forms import RegistrationForm, LoginForm, ModRegistrationForm, SongForm, UserSongForm
+from forms import RegistrationForm, LoginForm, ModRegistrationForm, SongForm, UserSongForm, UnlikeSongForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from flask_table import Table, Col
 #from flask_bcrypt import Bcrypt				# not using this in this version, using stevens hash and salt methods from hashlib
 from mysql.connector.cursor import MySQLCursorPrepared
 from accountAccess import checkExists, checkPassword, createAccount
+from userFunctions import getLikeCount, like, likeSong, unlinkeBand, unlikeSong, createPage
 #import flask_whooshalchemy as wa				# not suing this in this version
 
 app = Flask(__name__)
@@ -25,7 +26,7 @@ genres = ['Rock', 'Metal', 'Country', 'Electronic', 'Blues', 'Dance', 'Hip-Hop/R
 
 loggedin=0						# int flags to see if someone is logged in or not 1 logged in 0 not logged in
 ismod=0							# int flag to mark if they are moderator or not 1 is 0 isnt
-startuser = "Not Logged In"
+startuser = "cnn"
 
 posts = [						# most recent needs to be top post, announcement posts
 	 {
@@ -204,6 +205,7 @@ def songs():
 	global ismod
 	songform = SongForm()										# creates a song for a band from a moderator
 	usersongform= UserSongForm()
+	unlikesongform = UnlikeSongForm()
 	if(ismod):
 		if songform.validate_on_submit():
 			#if(createsong(songform.songname.data, songfrom.bandname.data, songform.album.data, songform.runTime.data)):  if error with runtime just change to generic value
@@ -249,11 +251,17 @@ def songs():
 				return render_template('modsongs.html', songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 	else:
 		if usersongform.validate_on_submit():
-			#if(createfavsong(startuser, usersongform.songname.data, usersongform.bandname.data, songform.album.data)):
-				#flash('Song added to favorites List!', 'success')
-			#else():									# create fav song fails
-				#flash('Error Adding Favorite Song Please retry', 'danger')
-			return render_template('songs.html', posts=posts, usersongform=usersongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+			if( likeSong(cnx, startuser, usersongform.songname.data, usersongform.bandname.data, usersongform.album.data)):
+				flash('Song added to favorites List!', 'success')
+			else:									# create fav song fails
+				flash('Error Adding Favorite Song Please retry', 'danger')
+			return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+		if unlikesongform.validate_on_submit():
+			#if(unlikesong(cnx, startuser, unlikesongform.songname.data, unlikesongform.bandname.data, unlikesongform.albumname.data)):
+			flash('Song Succesfully Removed', 'success')
+			#else():
+				#flash('Error Removing Song from Favorites Please retry', 'danger')	# error trying to unlike a song
+			return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 		if request.method == 'POST':								# if they used one of the text searches
 			nametext = request.form.get('namequery')
 			bandtext = request.form.get('bandquery')
@@ -287,9 +295,9 @@ def songs():
 				albumrows = db.engine.execute(albumq)
 				albumtable = SongResults(albumrows)
 				albumtable.border= True
-			return render_template('songs.html', usersongform=usersongform, nametable=nametable, bandtable=bandtable, albumtable=albumtable, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) # displays page with table
+			return render_template('songs.html', unlikesongform=unlikesongform, usersongform=usersongform, nametable=nametable, bandtable=bandtable, albumtable=albumtable, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) # displays page with table
 		else:
-			return render_template('songs.html', usersongform=usersongform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) #displays page without the table as no table has been created yet
+			return render_template('songs.html', unlikesongform=unlikesongform, usersongform=usersongform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) #displays page without the table as no table has been created yet
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():

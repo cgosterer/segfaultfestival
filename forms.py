@@ -23,15 +23,25 @@ class ModRegistrationForm(FlaskForm):
         confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
         submit = SubmitField('Create Mod')
 
-class SongForm(FlaskForm):
-        songname = StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])
+class SongForm(FlaskForm):			# used to add a song to a favorite list
+        songname = StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])		# removed DataRequired()
         bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max =50)])
 	album = StringField('Album Name', validators=[DataRequired(), Length(min=1, max =50)])
 	runTime = StringField('Run Time HH:MM:SS (Must be 8 Characters as Shown)', validators=[Length(min=8, max =8)])
         submit = SubmitField('Create Song')
 
+class UnlikeSongForm(FlaskForm):		# user is already tracked
+	usongname = StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])
+	ubandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max=50)])
+	ualbumname = StringField('Album Name', validators=[DataRequired(), Length(min=1, max=50)])
+	usubmit = SubmitField('Remove Song')
+
+class UnlikebandForm(FlaskForm):		# user is already tracked
+	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max=50)]) # bandname to unlike
+	submit = SubmitField('Remove Band')
+
 class UserSongForm(FlaskForm):
-	songname =StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)]) 
+	songname =StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])
 	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max=50)])
 	album = StringField('Album Name', validators=[DataRequired(), Length(min=1, max=50)])
 	submit = SubmitField('Create Favorite')
