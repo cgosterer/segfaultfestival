@@ -70,7 +70,7 @@ def setInactive(connection, band):
 def addMod(connection, band, user):
     cursor = connection.cursor(prepared=True)
     statement = "INSERT INTO BandModeratorList(moderator, bandName) VALUES(%s, %s);"
-    check = "SELECT * FROM Band WHERE bandName=%s;"
+    check = "SELECT * FROM Band WHERE name=%s;"
     cursor.execute(check, (band,))
     for data in cursor:
         cursor.execute(statement, (user, band))

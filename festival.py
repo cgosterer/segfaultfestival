@@ -4,14 +4,14 @@ import time
 
 from hashlib import sha256 as userHash
 from flask import Flask, render_template, url_for, flash, redirect, request
-from forms import RegistrationForm, LoginForm, ModRegistrationForm, SongForm, UserSongForm, UnlikeSongForm, UserBandForm, UnlikeBandForm
+from forms import RegistrationForm, LoginForm, ModRegistrationForm, SongForm, UserSongForm, UnlikeSongForm, UserBandForm, UnlikeBandForm, DispBandsForm, DispSongsForm
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from flask_table import Table, Col
 
 from mysql.connector.cursor import MySQLCursorPrepared
 
-from accountAccess import checkExists, checkPassword, createAccount
+from accountAccess import checkExists, checkModExists, checkPassword, createAccount
 from userFunctions import getLikeCount, like, likeSong, unlinkeBand, unlikeSong, createPage
 from bandModify import addSong, removeSong, updateFoundingDate, setActive, setInactive, addMod, removeMod, setSpotify, setWebsite
 
@@ -92,6 +92,16 @@ class festivalSchResults(Table):
 	festivalStart = Col('festivalStart')
 	bandName = Col('bandName')
 	performanceTime = Col('performanceTime')
+
+class favsongsresults(Table):
+	user = Col('user')
+	song = Col('song')
+	band = Col('band')
+	album = Col('album')
+
+class favbandsresults(Table):
+	bandName = Col('bandeName')
+	username = Col('username')
 
 class favoritedSongs(Table):
 	user = Col('user')
@@ -176,20 +186,20 @@ def bands():
 	if(ismod):
 		if form.validate_on_submit():
 			if(createAccount(cnx, form.username.data, form.password.data, form.email.data)):
-				flash('Your account has been created! You may now log in!', 'success')
+				if( addMod(cnx, form.bandname.data, form.username.data) ):
+					flash('Your Moderator Account  has been created!', 'success')
 			else:
 				flash('Error Creating Account, Please Retry with Different Username', 'success')
-				#return redirect(url_for('home'))
-			return render_template('modbands.html', posts=posts, form = form, songform=songform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)													      # actions for a  mod
-		else:
-			if request.method == 'POST':                                                                                  # if they fill out a text field
-				formtext = request.form['query']
-				sqls = text('select * from Band where name="'+ formtext  +'";')                                       # text(<sequel query here>)
-				rows = db.engine.execute(sqls)                                                                        # gets the rows that match the search
-				table = bandResults(rows)
-				table.border= True
-				return render_template('modbands.html', table=table, form=form, songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)              # displays rows and $
-			return render_template('modbands.html', form=form, songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+				return redirect(url_for('home'))
+			return render_template('modbands.html', posts=posts, form=form, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)													      # actions for a  mod
+		if request.method == 'POST':                                                                                  # if they fill out a text field
+			formtext = request.form['query']
+			sqls = text('select * from Band where name="'+ formtext  +'";')                                       # text(<sequel query here>)
+			rows = db.engine.execute(sqls)                                                                        # gets the rows that match the search
+			table = bandResults(rows)
+			table.border= True
+			return render_template('modbands.html', table=table, form=form, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)              # displays rows and $
+		return render_template('modbands.html', form=form, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 	else:
 		if userbandform.validate_on_submit():
 			if (loggedin == 0):                                                             # can only add favorites when logged in
@@ -227,9 +237,10 @@ def songs():
 	songform = SongForm()										# creates a song for a band from a moderator
 	usersongform= UserSongForm()
 	unlikesongform = UnlikeSongForm()
+	dispsongsform = DispSongsForm()
 	if(ismod):
 		if songform.validate_on_submit():
-			if(addSong( cnx, songform.bandname.data, songfrom.songname.data, songform.album.data)):  #if error with runtime just change to generic value
+			if(addSong( cnx, songform.bandname.data, songform.songname.data, songform.album.data)):  #if error with runtime just change to generic value
 				flash('Your Song has been created!', 'success')					 # tab over when fixed
 			else:											 # if create favorite song fails
 				flash('Error Creating Song Please retry', 'danger')
@@ -271,24 +282,33 @@ def songs():
 			else:
 				return render_template('modsongs.html', songform=songform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 	else:
+		if dispsongsform.validate_on_submit():
+			if(loggedin == 0):
+				flash('Please Log in to View favorites!', 'danger')
+				return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, dispsongsform=dispsongsform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+			favq = text('select user, song, band, album from FavoritedSongs where user="' + startuser + '";')
+			favrows = db.engine.execute(favq)
+			favtable = favsongsresults(favrows)
+			favtable.border = True
+			return render_template('favsongs.html', favtable=favtable, posts=posts, dispsongsform=dispsongsform, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 		if usersongform.validate_on_submit():
 			if (loggedin == 0):								# can only display favorites when logged in
 				flash('Please Log in to add Song to favorites!', 'danger')
-				return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+				return render_template('songs.html', posts=posts, usersongform=usersongform, dispsongsform=dispsongsform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 			if( likeSong(cnx, startuser, usersongform.songname.data, usersongform.bandname.data, usersongform.album.data)):
 				flash('Song added to favorites List!', 'success')
 			else:									# create fav song fails
 				flash('Error Adding Favorite Song Please retry', 'danger')
-			return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+			return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, dispsongsform=dispsongsform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 		if unlikesongform.validate_on_submit():
 			if(loggedin == 0):
 				flash('Please Log in to Remove a Song from favorites!', 'danger')
-				return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+				return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, dispsongsform=dispsongsform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 			if(unlikeSong(cnx, startuser, unlikesongform.usongname.data, unlikesongform.ubandname.data, unlikesongform.ualbumname.data)):
 				flash('Song Succesfully Removed', 'success')
 			else:
 				flash('Error Removing Song from Favorites Please retry', 'danger')	# error trying to unlike a song
-			return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
+			return render_template('songs.html', posts=posts, usersongform=usersongform, unlikesongform=unlikesongform, dispsongsform=dispsongsform, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod)
 		if request.method == 'POST':								# if they used one of the text searches
 			nametext = request.form.get('namequery')
 			bandtext = request.form.get('bandquery')
@@ -322,9 +342,9 @@ def songs():
 				albumrows = db.engine.execute(albumq)
 				albumtable = SongResults(albumrows)
 				albumtable.border= True
-			return render_template('songs.html', unlikesongform=unlikesongform, usersongform=usersongform, nametable=nametable, bandtable=bandtable, albumtable=albumtable, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) # displays page with table
+			return render_template('songs.html', dispsongsform=dispsongsform, unlikesongform=unlikesongform, usersongform=usersongform, nametable=nametable, bandtable=bandtable, albumtable=albumtable, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) # displays page with table
 		else:
-			return render_template('songs.html', unlikesongform=unlikesongform, usersongform=usersongform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) #displays page without the table as no table has been created yet
+			return render_template('songs.html', unlikesongform=unlikesongform, dispsongsform=dispsongsform, usersongform=usersongform, posts=posts, genres=genres, isLogged=loggedin, startuser=startuser, isMod=ismod) #displays page without the table as no table has been created yet
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():																# must use '1' when creating standing
@@ -347,7 +367,8 @@ def login():
 		if (checkPassword(cnx, form.username.data, form.password.data)):
 			flash('YOU have been logged in', 'success')
 			loggedin = 1
-			if(form.username.data == "ccc"):								# should check for moderator here with function that we create
+			#if(form.username.data == "ccc"):								# should check for moderator here with function that we create
+			if(checkModExists(cnx, form.username.data)):
 				ismod=1											# can still set this too one if they are a mod
 			startuser = form.username.data                                                                  # set the startuser to the name they type in for suername
 			return redirect(url_for('home'))								# redirect to home pg on succesful log in

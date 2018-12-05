@@ -16,14 +16,14 @@ def createAccount(connection, username, password, email):
     if(checkExists(connection, username) == True):
         return False
     cursor = connection.cursor(prepared=True)
-    statement = "INSERT INTO User(username, email, hash, salt, standing) VALUES(%s, %s, %s, %s, %s)"
+    statement = "INSERT INTO User(username, email, hash, salt) VALUES(%s, %s, %s, %s)"		# leaving it null is the only way it will work it seems
     maxint = 0xFFFFFFFFFFFFFFFF
     random.seed(int(time.time() * 1000))
     s = random.randint(0, maxint)
 #    print("Generated Salt", s)
     h = hashSalt(password, s)
 #    print("The hash is", h)
-    cursor.execute(statement, (username, email, h, s, thetruth))
+    cursor.execute(statement, (username, email, h, s))
     connection.commit()
     cursor.close()
     return True
@@ -50,7 +50,7 @@ def checkPassword(connection, username, password):
         val = True
     cursor.close()
     return val
-    
+
 #@tryAction
 def checkExists(connection, username):
     cursor = connection.cursor(prepared=True)
@@ -61,4 +61,13 @@ def checkExists(connection, username):
         val = True
     cursor.close()
     return val
-    
+
+def checkModExists(connection, username):
+	cursor = connection.cursor(prepared=True)
+	statement = "SELECT * FROM BandModeratorList WHERE moderator=%s"
+	cursor.execute(statement, (username,))
+	val = False
+	for data in cursor:
+		val = True
+	cursor.close()
+	return val
