@@ -13,9 +13,55 @@ def getLikeCount(connection, band):
 def like(connection, band, user):
     cursor = connection.cursor(prepared=True)
     statement = "INSERT INTO bandLikes(bandName, username) VALUES(%s, %s);"
+    check = "SELECT * FROM Band WHERE name=%s;"
+    cursor.execute(check, (band,))
+    for data in cursor:
+        cursor.close()
+        return False
     cursor.execute(statement, (band, user))
+    connection.commit()
     cursor.close()
-    
+    return True
+
+def likeSong(connection, user, song, band, album):
+    cursor = connection.cursor(prepared=True)
+    statement = "INSERT INTO FavoritedSongs(user, song, band, album) VALUES(%s, %s, %s, %s);"
+    check = "SELECT * FROM Song WHERE songName=%s AND bandName=%s AND album=%s;"
+    cursor.execute(check, (song, band, album))
+    for data in cursor:
+        cursor.close()
+        return False
+    cursor.execute(statement, user, song, band, album)
+    connection.commit()
+    cursor.close()
+    return True
+
+def unlinkeBand(connection, user, band):
+    cursor = connection.cursor(prepared=True)
+    statement = "DELETE FROM bandLikes WHERE bandname=%s AND username=%s;"
+    check = "SELECT * FROM bandLikes WHERE bandname=%s AND username=%s;"
+    cursor.execute(check, (band, user))
+    for data in cursor:
+        cursor.execute(statement, (band, user))
+        connection.commit()
+        cursor.close()
+        return True
+    cursor.close()
+    return False
+
+def unlikeSong(connection, user, song, band, album):
+    cursor = connection.cursor(prepared=True)
+    statement = "DELETE FROM FavoritedSongs WHERE user=%s AND song=%s AND band=%s AND album=%s;"
+    check = "SELECT * FROM FavoritedSongs WHERE user=%s AND song=%s AND band=%s AND album=%s;"
+    cursor.execute(check, (user, song, band, album))
+    for data in cursor:
+        cursor.execute(statement, (user, song, band, album))
+        connection.commit()
+        cursor.close()
+        return True
+    cursor.close()
+    return False
+
 def createPage(connection, user, band):
     cursor = connection.cursor(prepared=True)
     statement = "SELECT * FROM Bands WHERE name=%s;"
@@ -28,4 +74,4 @@ def createPage(connection, user, band):
     cursor.execute(statement, (band, user))
     connection.commit()
     cursor.close()
-    
+    return True
