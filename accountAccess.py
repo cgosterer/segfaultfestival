@@ -10,8 +10,9 @@ def hashSalt(password, salt):
     h = hasher.hexdigest()
     return h
 
-@tryAction
+#@tryAction
 def createAccount(connection, username, password, email):
+    thetruth=True								# had to create new variable to actually get a boolean type that wouldnt crash the website
     if(checkExists(connection, username) == True):
         return False
     cursor = connection.cursor(prepared=True)
@@ -22,12 +23,12 @@ def createAccount(connection, username, password, email):
 #    print("Generated Salt", s)
     h = hashSalt(password, s)
 #    print("The hash is", h)
-    cursor.execute(statement, (username, email, h, s, 1))
+    cursor.execute(statement, (username, email, h, s, thetruth))
     connection.commit()
     cursor.close()
     return True
-    
-@tryAction
+
+#@tryAction
 def checkPassword(connection, username, password):
     cursor = connection.cursor(prepared=True)
     select = "SELECT * FROM User WHERE username=%s AND hash=%s"
@@ -50,7 +51,7 @@ def checkPassword(connection, username, password):
     cursor.close()
     return val
     
-@tryAction
+#@tryAction
 def checkExists(connection, username):
     cursor = connection.cursor(prepared=True)
     statement = "SELECT * FROM User WHERE username=%s"

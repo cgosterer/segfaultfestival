@@ -1,7 +1,7 @@
 import mysql.connector
 from tryAction import tryAction
 
-@tryAction
+#@tryAction
 def getLikeCount(connection, band):
     cursor = connection.cursor(prepared=True)
     statement = "SELECT * FROM bandLikes WHERE bandName=%s;"
@@ -12,7 +12,7 @@ def getLikeCount(connection, band):
     cursor.close()
     return num
 
-@tryAction
+#@tryAction
 def like(connection, band, user):
     cursor = connection.cursor(prepared=True)
     statement = "INSERT INTO bandLikes(bandName, username) VALUES(%s, %s);"
@@ -26,7 +26,7 @@ def like(connection, band, user):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def likeSong(connection, user, song, band, album):
     cursor = connection.cursor(prepared=True)
     statement = "INSERT INTO FavoritedSongs(user, song, band, album) VALUES(%s, %s, %s, %s);"
@@ -39,7 +39,7 @@ def likeSong(connection, user, song, band, album):
         return True
     return False
 
-@tryAction
+#@tryAction
 def unlinkeBand(connection, user, band):
     cursor = connection.cursor(prepared=True)
     statement = "DELETE FROM bandLikes WHERE bandname=%s AND username=%s;"
@@ -53,7 +53,7 @@ def unlinkeBand(connection, user, band):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def unlikeSong(connection, user, song, band, album):
     cursor = connection.cursor(prepared=True)
     statement = "DELETE FROM FavoritedSongs WHERE user=%s AND song=%s AND band=%s AND album=%s;"
@@ -67,7 +67,7 @@ def unlikeSong(connection, user, song, band, album):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def createPage(connection, user, band):
     cursor = connection.cursor(prepared=True)
     statement = "SELECT * FROM Bands WHERE name=%s;"

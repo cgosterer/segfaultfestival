@@ -1,7 +1,7 @@
 import mysql.connector
 from tryAction import tryAction
 
-@tryAction
+#@tryAction
 def addSong(connection, bandName, songName, album):
     cursor = connection.cursor(prepared=True)
     statement = "INSERT INTO Song(songName, bandName, album) VALUES(%s, %s, %s);"
@@ -15,7 +15,7 @@ def addSong(connection, bandName, songName, album):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def removeSong(connection, bandName, songName, album):
     cursor = connection.cursor(prepared=True)
     statement = "DELETE FROM Song WHERE songName=%s AND bandName=%s AND album=%s;"
@@ -24,7 +24,7 @@ def removeSong(connection, bandName, songName, album):
     connection.commit()
     return True
 
-@tryAction
+#@tryAction
 def updateFoundingDate(connection, band, date):
     cursor = connection.cursor(prepared=True)
     statement = "UPDATE Band SET founded=%s WHERE bandName=%s;"
@@ -38,7 +38,7 @@ def updateFoundingDate(connection, band, date):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def setActive(connection, band):
     cursor = connection.cursor(prepared=True)
     statement = "UPDATE Band SET active=True WHERE bandName=%s;"
@@ -52,7 +52,7 @@ def setActive(connection, band):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def setInactive(connection, band):
     cursor = connection.cursor(prepared=True)
     statement = "UPDATE Band SET active=False WHERE bandName=%s;"
@@ -66,7 +66,7 @@ def setInactive(connection, band):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def addMod(connection, band, user):
     cursor = connection.cursor(prepared=True)
     statement = "INSERT INTO BandModeratorList(moderator, bandName) VALUES(%s, %s);"
@@ -80,7 +80,7 @@ def addMod(connection, band, user):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def removeMod(connection, band, user):
     cursor = connection.cursor(prepared=True)
     statement = "DELETE FROM BandModeratorList WHERE bandName=%s AND moderator=%s"
@@ -94,7 +94,7 @@ def removeMod(connection, band, user):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def setSpotify(connection, band, url):
     cursor = connection.cursor(prepared=True)
     statement = "UPDATE Band SET spotifyURL=%s WHERE bandName=%s;"
@@ -108,7 +108,7 @@ def setSpotify(connection, band, url):
     cursor.close()
     return False
 
-@tryAction
+#@tryAction
 def setWebsite(connection, band, url):
     cursor = connection.cursor(prepared=True)
     statement = "UPDATE Band SET websiteURL=%s WHERE bandName=%s;"

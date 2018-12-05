@@ -36,9 +36,13 @@ class UnlikeSongForm(FlaskForm):		# user is already tracked
 	ualbumname = StringField('Album Name', validators=[DataRequired(), Length(min=1, max=50)])
 	usubmit = SubmitField('Remove Song')
 
-class UnlikebandForm(FlaskForm):		# user is already tracked
-	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max=50)]) # bandname to unlike
-	submit = SubmitField('Remove Band')
+class UnlikeBandForm(FlaskForm):		# user is already tracked dont need to add user field here
+	ubandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max=50)]) # bandname to unlike
+	usubmit = SubmitField('Remove Band')
+
+class UserBandForm(FlaskForm):			# Add a band to favorites List
+	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max=50)])
+	submit = SubmitField('Add Band')
 
 class UserSongForm(FlaskForm):
 	songname =StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])

@@ -2,6 +2,63 @@
 
 {% block content %}
 
+	 <div class="content-section2">
+                <form method="POST" action="">
+                {{userbandform.hidden_tag()}}
+                <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Add A Band To Your Favorites List!</legend>
+                <div class="form-group">
+                {{userbandform.bandname.label(class="form-control-label")}}
+                {% if userbandform.bandname.errors %}
+                        {{ userbandform.bandname(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in userbandform.bandname.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{userbandform.bandname(class="form-control form-control-lg")}}
+                {% endif %}
+                </div>
+
+		 </fieldset>
+                <div class="from-group">
+                {{userbandform.submit(class="btn btn-outline-info")}}
+
+                </div>
+        </form>
+        </div>
+	
+<p><br></p>
+		 <div class="content-section2">
+                <form method="POST" action="">
+                {{unlikebandform.hidden_tag()}}
+                <fieldset class="form-group">
+                        <legend class="border-bottom mb-4">Remove A Band from Your Favorites List</legend>
+                <div class="form-group">
+                {{unlikebandform.ubandname.label(class="form-control-label")}}
+                {% if unlikebandform.ubandname.errors %}
+                        {{ unlikebandform.ubandname(class="form-control form-control-lg is-invalid")}}
+                        <div class="invalid-feedback">
+                        {% for error in unlikebandform.ubandname.errors %}
+                                <span>{{ error }}</span>
+                        {% endfor %}
+                        </div>
+                {% else %}
+                {{unlikebandform.ubandname(class="form-control form-control-lg")}}
+                {% endif %}
+                </div>
+
+                 </fieldset>
+                <div class="from-group">
+                {{unlikebandform.usubmit(class="btn btn-outline-info")}}
+
+                </div>
+        </form>
+        </div>
+
+<p><br><br></p>
+
         <h1>Search Bands By Name</h1>
          <form class="form-inline" method="POST">
            <div class="form-group">
@@ -28,7 +85,10 @@
 <p><br><br><br><br><br></p>
 <p><br><br><br><br><br></p>
         {{table}}
+<p><br></p>
 
+<img src="https://d265059lu1u7jc.cloudfront.net/site/uploads/2018/03/HeaderImageB.jpg" alt="filler text">
+<p><br></p>
 {% endblock content %}
 
 
