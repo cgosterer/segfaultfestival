@@ -7,7 +7,10 @@ def addSong(connection, bandName, songName, album):
     statement = "INSERT INTO Song(songName, bandName, album) VALUES(%s, %s, %s);"
     check = "SELECT * FROM Band WHERE name=%s;"
     cursor.execute(check, (bandName,))
+    canExec = False
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (songName, bandName, album))
         cursor.close()
         connection.commit()
@@ -30,7 +33,10 @@ def updateFoundingDate(connection, band, date):
     statement = "UPDATE Band SET founded=%s WHERE bandName=%s;"
     check = "SELECT * FROM Band WHERE bandName=%s;"
     cursor.execute(check, (band,))
+    canExec = False
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (date, band))
         cursor.close()
         connection.commit()
@@ -44,7 +50,10 @@ def setActive(connection, band):
     statement = "UPDATE Band SET active=True WHERE bandName=%s;"
     check = "SELECT * FROM Band WHERE bandName=%s;"
     cursor.execute(check, (band,))
+    canExec = False
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (band,))
         cursor.close()
         connection.commit()
@@ -58,7 +67,10 @@ def setInactive(connection, band):
     statement = "UPDATE Band SET active=False WHERE bandName=%s;"
     check = "SELECT * FROM Band WHERE bandName=%s;"
     cursor.execute(check, (band,))
+    canExec = False
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (band,))
         cursor.close()
         connection.commit()
@@ -72,7 +84,10 @@ def addMod(connection, band, user):
     statement = "INSERT INTO BandModeratorList(moderator, bandName) VALUES(%s, %s);"
     check = "SELECT * FROM Band WHERE name=%s;"
     cursor.execute(check, (band,))
+    canExec = False
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (user, band))
         cursor.close()
         connection.commit()
@@ -85,8 +100,11 @@ def removeMod(connection, band, user):
     cursor = connection.cursor(prepared=True)
     statement = "DELETE FROM BandModeratorList WHERE bandName=%s AND moderator=%s"
     check = "SELECT * FROM Band WHERE bandName=%s;"
+    canExec = False
     cursor.execute(check, (band,))
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (band, user))
         cursor.close()
         connection.commit()
@@ -100,7 +118,10 @@ def setSpotify(connection, band, url):
     statement = "UPDATE Band SET spotifyURL=%s WHERE bandName=%s;"
     check = "SELECT * FROM Band WHERE bandName=%s;"
     cursor.execute(check, (band,))
+    canExec = False
     for data in cursor:
+        canExec = True
+    if canExec:
         cursor.execute(statement, (url, band))
         connection.commit()
         cursor.close()
@@ -114,7 +135,10 @@ def setWebsite(connection, band, url):
     statement = "UPDATE Band SET websiteURL=%s WHERE bandName=%s;"
     check = "SELECT * FROM Band WHERE bandName=%s;"
     cursor.execute(check, (band,))
+    canExec = True
     for data in cursor:
+        canExec = False
+    if canExec:
         cursor.execute(statement, (url, band))
         connection.commit()
         cursor.close()
