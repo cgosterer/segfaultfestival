@@ -16,19 +16,19 @@ class LoginForm(FlaskForm):
 	submit = SubmitField('Login')
 
 class ModRegistrationForm(FlaskForm):
-        username = StringField('Username', validators=[DataRequired(), Length(min=2, max=40)])
-        email = StringField('Email', validators=[DataRequired(), Email()])
+	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=40)])
+	email = StringField('Email', validators=[DataRequired(), Email()]
 	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max = 50)])
-        password = PasswordField('Password', validators=[DataRequired()])
-        confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-        submit = SubmitField('Create Mod')
+	password = PasswordField('Password', validators=[DataRequired()])
+	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+	submit = SubmitField('Create Mod')
 
 class SongForm(FlaskForm):			# used to add a song to a favorite list
-        songname = StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])		# removed DataRequired()
-        bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max =50)])
+	songname = StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])		# removed DataRequired()
+	bandname = StringField('Band Name', validators=[DataRequired(), Length(min=1, max =50)])
 	album = StringField('Album Name', validators=[DataRequired(), Length(min=1, max =50)])
 	runTime = StringField('Run Time HH:MM:SS (Must be 8 Characters as Shown)', validators=[Length(min=8, max =8)])
-        submit = SubmitField('Create Song')
+	submit = SubmitField('Create Song')
 
 class UnlikeSongForm(FlaskForm):		# user is already tracked
 	usongname = StringField('Song Name', validators=[DataRequired(), Length(min=1, max=50)])
