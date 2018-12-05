@@ -33,7 +33,7 @@ def likeSong(connection, user, song, band, album):
     check = "SELECT * FROM Song WHERE songName=%s AND bandName=%s AND album=%s;"
     cursor.execute(check, (song, band, album))
     for data in cursor:
-        cursor.execute(statement, user, song, band, album)
+        cursor.execute(statement, (user, song, band, album))
         connection.commit()
         cursor.close()
         return True
